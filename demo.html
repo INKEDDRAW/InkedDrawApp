@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InkedDraw - Luxury Social Platform Demo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1A1A1A;
+            color: #F4F1ED;
+            overflow-x: hidden;
+        }
+        
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #2C2C2E;
+            border-radius: 40px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #1A1A1A;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #8D5B2E, #6D213C);
+        }
+        
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #C4A57F;
+            margin-bottom: 8px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: #F4F1ED;
+            opacity: 0.8;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .feature-card {
+            background: #2C2C2E;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #8D5B2E;
+        }
+        
+        .feature-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            color: #C4A57F;
+            margin-bottom: 8px;
+        }
+        
+        .feature-desc {
+            font-size: 14px;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+        
+        .demo-note {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: #2C2C2E;
+            border-radius: 12px;
+        }
+        
+        .demo-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: #C4A57F;
+            margin-bottom: 16px;
+        }
+        
+        .nav-tabs {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #2C2C2E;
+            padding: 16px;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .nav-tab {
+            text-align: center;
+            color: #8D5B2E;
+            font-size: 12px;
+        }
+        
+        .nav-tab.active {
+            color: #C4A57F;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="header">
+                <div class="logo">INKED DRAW</div>
+                <div class="tagline">Luxury Social Platform</div>
+            </div>
+            
+            <div class="content">
+                <div class="feature-card">
+                    <div class="feature-title">Premium Experience</div>
+                    <div class="feature-desc">Sophisticated mobile application for cigar, wine, and beer connoisseurs with leather-bound journal aesthetic</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-title">Private Member's Lounge</div>
+                    <div class="feature-desc">Exclusive atmosphere with deliberate, weighty motion and premium, tactile interactions</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-title">Luxury Design</div>
+                    <div class="feature-desc">Charcoal gray backgrounds, leather brown accents, and antique gold highlights create an upscale experience</div>
+                </div>
+            </div>
+            
+            <div class="nav-tabs">
+                <div class="nav-tab active">Home</div>
+                <div class="nav-tab">Journal</div>
+                <div class="nav-tab">Social</div>
+                <div class="nav-tab">Profile</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="demo-note">
+        <div class="demo-title">Live Demo</div>
+        <p>This is a visual representation of the InkedDraw luxury social platform. The full React Native application features interactive navigation, premium animations, and sophisticated user experiences for connoisseurs.</p>
+    </div>
+</body>
+</html>
