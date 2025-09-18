@@ -108,6 +108,10 @@ dist/
 # OS
 Thumbs.db
 ehthumbs.db
+
+# Google Cloud credentials (SECURITY: Never commit these!)
+vivid-monitor-471721-c1-243c91ce602b.json
+*.json
 App.js.original
 App.minimal.js
 android-release.bundle
