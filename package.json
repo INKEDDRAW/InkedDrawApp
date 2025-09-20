@@ -10,13 +10,20 @@
   "scripts": {
     "dev:frontend": "cd frontend && npm start",
     "dev:backend": "cd backend && npm run start:dev",
+    "dev:docker": "docker-compose up --build",
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",
+    "build:docker": "docker-compose build",
     "test:frontend": "cd frontend && npm test",
     "test:backend": "cd backend && npm test",
+    "test:all": "npm run test:frontend && npm run test:backend",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:backend": "cd backend && npm run lint",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\""
+    "lint:all": "npm run lint:frontend && npm run lint:backend",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "clean": "rm -rf frontend/node_modules backend/node_modules node_modules",
+    "fresh-install": "npm run clean && npm install && cd frontend && npm install && cd ../backend && npm install"
   },
   "devDependencies": {
     "prettier": "^3.6.2"

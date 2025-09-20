@@ -1,0 +1,53 @@
+# AWS App Runner Configuration
+# Production deployment configuration for Inked Draw Backend
+
+version: 1.0
+runtime: docker
+build:
+  commands:
+    build:
+      - echo "Building Inked Draw Backend..."
+      - docker build -t inked-draw-backend .
+run:
+  runtime-version: latest
+  command: node dist/main.js
+  network:
+    port: 3000
+    env: PORT
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: PORT
+      value: "3000"
+    - name: DATABASE_URL
+      value: ${DATABASE_URL}
+    - name: SUPABASE_URL
+      value: ${SUPABASE_URL}
+    - name: SUPABASE_ANON_KEY
+      value: ${SUPABASE_ANON_KEY}
+    - name: SUPABASE_SERVICE_ROLE_KEY
+      value: ${SUPABASE_SERVICE_ROLE_KEY}
+    - name: JWT_SECRET
+      value: ${JWT_SECRET}
+    - name: REDIS_URL
+      value: ${REDIS_URL}
+    - name: POSTHOG_API_KEY
+      value: ${POSTHOG_API_KEY}
+    - name: POSTHOG_HOST
+      value: ${POSTHOG_HOST}
+    - name: GOOGLE_VISION_API_KEY
+      value: ${GOOGLE_VISION_API_KEY}
+    - name: AWS_REKOGNITION_ACCESS_KEY
+      value: ${AWS_REKOGNITION_ACCESS_KEY}
+    - name: AWS_REKOGNITION_SECRET_KEY
+      value: ${AWS_REKOGNITION_SECRET_KEY}
+    - name: MODERATION_AUTO_APPROVE_THRESHOLD
+      value: "0.8"
+    - name: MODERATION_AUTO_REJECT_THRESHOLD
+      value: "0.3"
+    - name: MODERATION_REQUIRE_REVIEW_THRESHOLD
+      value: "0.6"
+    - name: MODERATION_MAX_POSTS_PER_HOUR
+      value: "10"
+    - name: MODERATION_MAX_REPORTS_PER_DAY
+      value: "20"

@@ -1,0 +1,243 @@
+name: Mobile App Build
+
+on:
+  push:
+    branches: [ main, master ]
+    paths: [ 'frontend/**' ]
+  pull_request:
+    branches: [ main, master ]
+    paths: [ 'frontend/**' ]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - ios
+          - android
+      profile:
+        description: 'Build profile'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - preview
+          - production
+
+jobs:
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.platform == 'android' || github.event.inputs.platform == 'all' || github.event.inputs.platform == '' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Expo CLI
+        run: npm install -g @expo/cli eas-cli
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Android APK (Development)
+        if: ${{ github.event.inputs.profile == 'development' || github.event.inputs.profile == '' }}
+        run: |
+          cd frontend
+          eas build --platform android --profile development --non-interactive
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Build Android AAB (Production)
+        if: ${{ github.event.inputs.profile == 'production' }}
+        run: |
+          cd frontend
+          eas build --platform android --profile production --non-interactive
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+  build-ios:
+    name: Build iOS
+    runs-on: macos-latest
+    if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'all' || github.event.inputs.platform == '' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Setup Expo CLI
+        run: npm install -g @expo/cli eas-cli
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build iOS Simulator (Development)
+        if: ${{ github.event.inputs.profile == 'development' || github.event.inputs.profile == '' }}
+        run: |
+          cd frontend
+          eas build --platform ios --profile development --non-interactive
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Build iOS Archive (Production)
+        if: ${{ github.event.inputs.profile == 'production' }}
+        run: |
+          cd frontend
+          eas build --platform ios --profile production --non-interactive
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+  submit-stores:
+    name: Submit to App Stores
+    runs-on: ubuntu-latest
+    needs: [build-android, build-ios]
+    if: ${{ github.ref == 'refs/heads/main' && github.event.inputs.profile == 'production' }}
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Setup Expo CLI
+        run: npm install -g @expo/cli eas-cli
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Submit to Google Play Store
+        run: |
+          cd frontend
+          eas submit --platform android --latest --non-interactive
+        env:
+          GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+
+      - name: Submit to Apple App Store
+        run: |
+          cd frontend
+          eas submit --platform ios --latest --non-interactive
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+
+      - name: Notify submission success
+        uses: 8398a7/action-slack@v3
+        if: success()
+        with:
+          status: success
+          text: '📱 Mobile app submitted to stores successfully!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  update-ota:
+    name: OTA Update
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Setup Expo CLI
+        run: npm install -g @expo/cli
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Publish OTA Update
+        run: |
+          cd frontend
+          eas update --branch production --message "Production OTA update from ${{ github.sha }}"
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Notify OTA update success
+        uses: 8398a7/action-slack@v3
+        if: success()
+        with:
+          status: success
+          text: '🔄 OTA update published successfully!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

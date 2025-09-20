@@ -1,0 +1,145 @@
+# Prometheus Alert Rules for Inked Draw
+# Production monitoring and alerting
+
+groups:
+  - name: inked-draw-alerts
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors per second"
+
+      # High response time
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }} seconds"
+
+      # Service down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.instance }} is down"
+          description: "Service {{ $labels.instance }} has been down for more than 1 minute"
+
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}%"
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value }}%"
+
+      # Disk space low
+      - alert: DiskSpaceLow
+        expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk usage is {{ $value }}%"
+
+      # Redis down
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been down for more than 1 minute"
+
+      # High Redis memory usage
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis high memory usage"
+          description: "Redis memory usage is {{ $value }}%"
+
+      # Database connection issues
+      - alert: DatabaseConnectionIssues
+        expr: increase(database_connection_errors_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection issues"
+          description: "{{ $value }} database connection errors in the last 5 minutes"
+
+      # High moderation queue
+      - alert: HighModerationQueue
+        expr: moderation_queue_pending_items > 100
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High moderation queue"
+          description: "{{ $value }} items pending in moderation queue"
+
+      # Failed moderation processing
+      - alert: ModerationProcessingFailures
+        expr: increase(moderation_processing_failures_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Moderation processing failures"
+          description: "{{ $value }} moderation processing failures in the last 5 minutes"
+
+      # High user report rate
+      - alert: HighUserReportRate
+        expr: increase(user_reports_total[1h]) > 50
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High user report rate"
+          description: "{{ $value }} user reports in the last hour"
+
+      # WebSocket connection issues
+      - alert: WebSocketConnectionIssues
+        expr: websocket_connections_active < websocket_connections_expected * 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WebSocket connection issues"
+          description: "Active WebSocket connections ({{ $value }}) below expected threshold"
+
+      # AI service failures
+      - alert: AIServiceFailures
+        expr: increase(ai_service_failures_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "AI service failures"
+          description: "{{ $value }} AI service failures in the last 5 minutes"
