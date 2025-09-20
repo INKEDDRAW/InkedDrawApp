@@ -48,7 +48,7 @@ Go to: **GitHub → Settings → Secrets and variables → Actions → Variables
 SUPABASE_URL = https://gyhpbpfxollqcomxgrqb.supabase.co
 SUPABASE_ANON_KEY = your_public_supabase_anon_key
 POSTHOG_HOST = https://app.posthog.com
-AWS_REGION = us-east-1
+AWS_REGION = us-west-1
 NODE_ENV = production
 PORT = 3000
 API_VERSION = v1
