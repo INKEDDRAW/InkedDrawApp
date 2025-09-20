@@ -190,7 +190,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Deploy to App Runner
         run: |
@@ -204,13 +204,13 @@ jobs:
                   "RuntimeEnvironmentVariables": {
                     "NODE_ENV": "production",
                     "DATABASE_URL": "${{ secrets.DATABASE_URL }}",
-                    "SUPABASE_URL": "${{ secrets.SUPABASE_URL }}",
-                    "SUPABASE_ANON_KEY": "${{ secrets.SUPABASE_ANON_KEY }}",
+                    "SUPABASE_URL": "${{ vars.SUPABASE_URL }}",
+                    "SUPABASE_ANON_KEY": "${{ vars.SUPABASE_ANON_KEY }}",
                     "SUPABASE_SERVICE_ROLE_KEY": "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}",
                     "JWT_SECRET": "${{ secrets.JWT_SECRET }}",
                     "REDIS_URL": "${{ secrets.REDIS_URL }}",
                     "POSTHOG_API_KEY": "${{ secrets.POSTHOG_API_KEY }}",
-                    "POSTHOG_HOST": "${{ secrets.POSTHOG_HOST }}"
+                    "POSTHOG_HOST": "${{ vars.POSTHOG_HOST }}"
                   }
                 },
                 "ImageRepositoryType": "ECR_PUBLIC"
@@ -251,17 +251,17 @@ jobs:
         run: npm run build
         env:
           REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
-          REACT_APP_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          REACT_APP_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          REACT_APP_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          REACT_APP_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
           REACT_APP_POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
-          REACT_APP_POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+          REACT_APP_POSTHOG_HOST: ${{ vars.POSTHOG_HOST }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Deploy to S3
         run: |
